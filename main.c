@@ -1,47 +1,44 @@
-// Requires SDL to be installed: sudo apt-get install libsdl2-dev
-
-
 #include <SDL2/SDL.h>
 #include <stdlib.h>
 #include <time.h>
+#include "./libs/particle.h"
 
-#define SCREEN_WIDTH 1280
-#define SCREEN_HEIGHT 720
-#define PARTICLE_COUNT 250
-#define PARTICLE_RADIUS 5
+#define SCREEN_WIDTH 800
+#define SCREEN_HEIGHT 600
+#define PARTICLE_COUNT 10
+#define PARTICLE_RADIUS 10
 
-typedef struct {
-    float x, y;
-    float vx, vy;
-} Particle;
-
+/// @brief Moves the particles.
+/// @param particles A set of particles.
+/// @param count Amount of particles in the given set.
 void move_particles(Particle particles[], int count) {
     for (int i = 0; i < count; i++) {
         particles[i].x += particles[i].vx;
         particles[i].y += particles[i].vy;
 
         // Deflecting
-        if (particles[i].x <= PARTICLE_RADIUS 
-        || particles[i].x >= SCREEN_WIDTH - PARTICLE_RADIUS)
+        if (particles[i].x <= PARTICLE_RADIUS * 2
+        || particles[i].x >= SCREEN_WIDTH - PARTICLE_RADIUS * 2)
             particles[i].vx = -particles[i].vx;
 
-        if (particles[i].y <= PARTICLE_RADIUS
-        || particles[i].y >= SCREEN_HEIGHT - PARTICLE_RADIUS)
+        if (particles[i].y <= PARTICLE_RADIUS * 2
+        || particles[i].y >= SCREEN_HEIGHT - PARTICLE_RADIUS * 2)
             particles[i].vy = -particles[i].vy;
     }
 }
 
 void draw_particles(SDL_Renderer *renderer, Particle particles[], int count) {
     for (int i = 0; i < count; i++) {
-        SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-
         for (int w = 0; w < PARTICLE_RADIUS * 2; w++) {
             for (int h = 0; h < PARTICLE_RADIUS * 2; h++) {
                 int dx = PARTICLE_RADIUS - w;
                 int dy = PARTICLE_RADIUS - h;
 
-                if ((dx * dx + dy * dy) <= (PARTICLE_RADIUS * PARTICLE_RADIUS)) 
+                if ((dx * dx + dy * dy) <= (PARTICLE_RADIUS * PARTICLE_RADIUS)) {
+                    int particle_color = particles[i].color;
+                    SDL_SetRenderDrawColor(renderer, particle_color, particle_color, particle_color, 255);
                     SDL_RenderDrawPoint(renderer, particles[i].x + dx, particles[i].y + dy);
+                }
             }
         }
     }
@@ -53,6 +50,8 @@ int main() {
     SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 
     srand(time(NULL));
+
+    // Creating the particles
     Particle particles[PARTICLE_COUNT];
 
     for (int i = 0; i < PARTICLE_COUNT; i++) {
@@ -60,6 +59,10 @@ int main() {
         particles[i].y = rand() % SCREEN_HEIGHT;
         particles[i].vx = ((float)(rand() % 100) / 100.0f) - 0.5f;
         particles[i].vy = ((float)(rand() % 100) / 100.0f) - 0.5f;
+
+        int color = rand() % 256;
+        printf("%d ", color);
+        particles[i].color = color;
     }
 
     int running = 1;
