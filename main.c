@@ -5,7 +5,7 @@
 
 #define SCREEN_WIDTH 800
 #define SCREEN_HEIGHT 600
-#define PARTICLE_COUNT 10
+#define PARTICLE_COUNT 20
 #define PARTICLE_RADIUS 10
 
 /// @brief Moves the particles.
@@ -35,13 +35,16 @@ void draw_particles(SDL_Renderer *renderer, Particle particles[], int count) {
                 int dy = PARTICLE_RADIUS - h;
 
                 if ((dx * dx + dy * dy) <= (PARTICLE_RADIUS * PARTICLE_RADIUS)) {
-                    int particle_color = particles[i].color;
-                    SDL_SetRenderDrawColor(renderer, particle_color, particle_color, particle_color, 255);
+                    SDL_SetRenderDrawColor(renderer, particles[i].color[0], particles[i].color[1], particles[i].color[2], 255);
                     SDL_RenderDrawPoint(renderer, particles[i].x + dx, particles[i].y + dy);
                 }
             }
         }
     }
+}
+
+int get_random_color() {
+    return random() % 256;
 }
 
 int main() {
@@ -60,9 +63,8 @@ int main() {
         particles[i].vx = ((float)(rand() % 100) / 100.0f) - 0.5f;
         particles[i].vy = ((float)(rand() % 100) / 100.0f) - 0.5f;
 
-        int color = rand() % 256;
-        printf("%d ", color);
-        particles[i].color = color;
+        for (int c = 0; c < 3; c++) 
+            particles[i].color[c] = get_random_color();
     }
 
     int running = 1;

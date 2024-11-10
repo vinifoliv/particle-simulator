@@ -5,7 +5,7 @@
 typedef struct {
     float x, y;
     float vx, vy;
-    int color;
+    int color[3];
 } Particle;
 
 #endif
